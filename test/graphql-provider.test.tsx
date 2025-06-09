@@ -6,7 +6,7 @@ import type { Client } from 'urql'
 
 it('throws if no provider is present', () => {
   const consumer = () => {
-    useGraphQLClient() // should throw
+    useGraphQLClient()
   }
   expect(consumer).toThrow(/Did you forget to wrap/)
 })

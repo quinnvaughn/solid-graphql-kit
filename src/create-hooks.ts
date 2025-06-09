@@ -13,7 +13,7 @@ export function createQuery<TData, TVars extends object>(
   document: TypedDocumentNode<TData, TVars>,
   getVariables: () => TVars
 ) {
-  const client = useGraphQLClient() // ← here’s the change
+  const client = useGraphQLClient()
   const [data, { refetch }] = createResource(getVariables, (vars) =>
     client
       .query(document, vars)
