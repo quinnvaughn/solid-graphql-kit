@@ -95,6 +95,7 @@ export function createMutation<TData, TVars extends object>(
 export function createSubscription<TData extends object, TVars extends object>(
   document: TypedDocumentNode<TData, TVars>,
   getVariables: Accessor<TVars>,
+  context?: Partial<OperationContext>,
   onError?: (error: Error) => void
 ): Accessor<TData | undefined> {
   const client = useGraphQLClient()
@@ -103,7 +104,7 @@ export function createSubscription<TData extends object, TVars extends object>(
   createEffect(() => {
     const vars = getVariables()
     const { unsubscribe } = pipe(
-      client.subscription<TData, TVars>(document, vars),
+      client.subscription<TData, TVars>(document, vars, context),
       subscribe((res) => {
         if (res.error) {
           onError?.(res.error)
