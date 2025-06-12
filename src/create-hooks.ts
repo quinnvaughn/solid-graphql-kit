@@ -9,14 +9,17 @@ import { useGraphQLClient } from "./graphql-context"
 import { pipe, subscribe } from "wonka"
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core"
 
-export function createQuery<TData, TVars extends object>(
-  document: TypedDocumentNode<TData, TVars>,
-  getVariables: () => TVars
-) {
+export function createQuery<TData, TVars extends object>({
+  query,
+  variables,
+}: {
+  query: TypedDocumentNode<TData, TVars>
+  variables?: () => TVars
+}) {
   const client = useGraphQLClient()
-  const [data, { refetch }] = createResource(getVariables, (vars) =>
+  const [data, { refetch }] = createResource(variables, (vars) =>
     client
-      .query(document, vars)
+      .query(query, vars)
       .toPromise()
       .then((res) => {
         if (res.error) throw res.error

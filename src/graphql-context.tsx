@@ -1,5 +1,5 @@
 import { createContext, useContext } from "solid-js"
-import type { Client } from "urql"
+import type { Client } from "@urql/core"
 
 const GraphQLClientContext = createContext<Client>()
 

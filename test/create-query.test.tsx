@@ -22,9 +22,10 @@ describe("createQuery", () => {
 
     const [id, setId] = createSignal("1")
     function Test() {
-      const { data, loading, error } = createQuery(DUMMY_QUERY, () => ({
-        id: id(),
-      }))
+      const { data, loading, error } = createQuery({
+        query: DUMMY_QUERY,
+        variables: () => ({ id: id() }),
+      })
       return (
         <>
           <div data-testid="loading">{loading() ? "yes" : "no"}</div>
@@ -54,7 +55,10 @@ describe("createQuery", () => {
     })
 
     function TestErr() {
-      const { loading, error } = createQuery(DUMMY_QUERY, () => ({ id: "x" }))
+      const { loading, error } = createQuery({
+        query: DUMMY_QUERY,
+        variables: () => ({ id: "1" }),
+      })
       return (
         <>
           <div data-testid="loading">{loading() ? "yes" : "no"}</div>
