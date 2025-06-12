@@ -71,4 +71,29 @@ describe("createQuery", () => {
     await waitFor(() => expect(getByTestId("error").textContent).toBe("oops"))
     expect(getByTestId("loading").textContent).toBe("no")
   })
+  it("works with no variables", async () => {
+    fakeClient.query.mockReturnValue({
+      toPromise: () => Promise.resolve({ data: { foo: "bar" } }),
+    })
+
+    function TestNoVars() {
+      const { data, loading, error } = createQuery({
+        query: DUMMY_QUERY,
+      })
+      return (
+        <>
+          <div data-testid="loading">{loading() ? "yes" : "no"}</div>
+          <div data-testid="data">{data()?.foo}</div>
+          <div data-testid="error">{error()?.message}</div>
+        </>
+      )
+    }
+
+    const { getByTestId } = render(() => <TestNoVars />)
+
+    expect(getByTestId("loading").textContent).toBe("yes")
+
+    await waitFor(() => expect(getByTestId("data").textContent).toBe("bar"))
+    expect(getByTestId("loading").textContent).toBe("no")
+  })
 })

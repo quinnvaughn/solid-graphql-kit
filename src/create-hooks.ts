@@ -8,18 +8,24 @@ import {
 import { useGraphQLClient } from "./graphql-context"
 import { pipe, subscribe } from "wonka"
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core"
+import { OperationContext } from "@urql/core"
 
 export function createQuery<TData, TVars extends object>({
   query,
   variables,
+  context,
 }: {
   query: TypedDocumentNode<TData, TVars>
   variables?: () => TVars
+  context?: Partial<OperationContext>
 }) {
   const client = useGraphQLClient()
-  const [data, { refetch }] = createResource(variables, (vars) =>
+
+  const getVars = variables ?? (() => ({} as TVars))
+
+  const [data, { refetch }] = createResource(getVars, (vars) =>
     client
-      .query(query, vars)
+      .query(query, vars, context)
       .toPromise()
       .then((res) => {
         if (res.error) throw res.error
@@ -41,7 +47,8 @@ export type MutationResult<T> =
   | { status: "error"; data: null; error: Error; fetching: false }
 
 export function createMutation<TData, TVars extends object>(
-  document: TypedDocumentNode<TData, TVars>
+  document: TypedDocumentNode<TData, TVars>,
+  context?: Partial<OperationContext>
 ): {
   execute: (variables: TVars) => Promise<void>
   result: Accessor<MutationResult<TData>>
@@ -60,7 +67,7 @@ export function createMutation<TData, TVars extends object>(
     setState({ status: "fetching", data: null, error: null, fetching: true })
     try {
       const res = await client
-        .mutation<TData, TVars>(document, variables)
+        .mutation<TData, TVars>(document, variables, context)
         .toPromise()
       if (res.error) throw res.error
       setState({
