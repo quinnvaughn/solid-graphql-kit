@@ -12,4 +12,5 @@ export {
   createMutation,
   createSubscription,
   MutationResult,
+  fetchQuery,
 } from "./create-hooks"

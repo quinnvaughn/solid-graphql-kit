@@ -8,7 +8,7 @@ import {
 import { useGraphQLClient } from "./graphql-context"
 import { pipe, subscribe } from "wonka"
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core"
-import { OperationContext } from "@urql/core"
+import { Client, OperationContext } from "@urql/core"
 
 export function createQuery<TData, TVars extends object>({
   query,
@@ -38,6 +38,19 @@ export function createQuery<TData, TVars extends object>({
     error: () => data.error,
     refetch: (vars?: TVars) => (vars != null ? refetch(vars) : refetch()),
   }
+}
+
+export async function fetchQuery<TData, TVars extends object>(
+  client: Client,
+  document: TypedDocumentNode<TData, TVars>,
+  variables?: TVars,
+  context?: Partial<OperationContext>
+): Promise<TData> {
+  const res = await client
+    .query(document, variables ?? ({} as TVars), context)
+    .toPromise()
+  if (res.error) throw res.error
+  return res.data!
 }
 
 export type MutationResult<T> =
